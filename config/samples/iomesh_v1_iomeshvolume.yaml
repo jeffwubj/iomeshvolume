@@ -1,0 +1,6 @@
+apiVersion: iomesh.iomesh.com/v1
+kind: IOMeshVolume
+metadata:
+  name: iomeshvolume-sample
+spec:
+  # TODO(user): Add fields here

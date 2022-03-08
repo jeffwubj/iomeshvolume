@@ -1,0 +1,20 @@
+# permissions for end users to view iomeshvolumes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: iomeshvolume-viewer-role
+rules:
+- apiGroups:
+  - iomesh.iomesh.com
+  resources:
+  - iomeshvolumes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - iomesh.iomesh.com
+  resources:
+  - iomeshvolumes/status
+  verbs:
+  - get

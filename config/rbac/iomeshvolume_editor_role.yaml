@@ -1,0 +1,24 @@
+# permissions for end users to edit iomeshvolumes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: iomeshvolume-editor-role
+rules:
+- apiGroups:
+  - iomesh.iomesh.com
+  resources:
+  - iomeshvolumes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - iomesh.iomesh.com
+  resources:
+  - iomeshvolumes/status
+  verbs:
+  - get
