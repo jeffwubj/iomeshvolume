@@ -17,7 +17,9 @@ limitations under the License.
 package v1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -27,15 +29,18 @@ import (
 type IOMeshVolumeSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of IOMeshVolume. Edit iomeshvolume_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Node string                            `json:"node,omitempty"`
+	PVC  *corev1.PersistentVolumeClaimSpec `json:"pvc,omitempty"`
 }
 
 // IOMeshVolumeStatus defines the observed state of IOMeshVolume
 type IOMeshVolumeStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	Node       string                 `json:"node,omitempty"`
+	DeviceName string                 `json:"deviceName,omitempty"`
+	Phase      *cdiv1.DataVolumePhase `json:"phase,omitempty"`
 }
 
 //+kubebuilder:object:root=true
