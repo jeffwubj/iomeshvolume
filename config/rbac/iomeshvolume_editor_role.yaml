@@ -5,7 +5,7 @@ metadata:
   name: iomeshvolume-editor-role
 rules:
 - apiGroups:
-  - iomesh.iomesh.com
+  - poc.iomesh.com
   resources:
   - iomeshvolumes
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - iomesh.iomesh.com
+  - poc.iomesh.com
   resources:
   - iomeshvolumes/status
   verbs:

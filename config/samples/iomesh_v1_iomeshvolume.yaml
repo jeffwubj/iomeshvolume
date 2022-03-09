@@ -1,9 +1,9 @@
-apiVersion: iomesh.iomesh.com/v1
+apiVersion: poc.iomesh.com/v1
 kind: IOMeshVolume
 metadata:
   name: iomeshvolume-sample
 spec:
-  node: jeffwu-worker02
+  node: jeffwu-worker01
   pvc: 
     storageClassName: iomesh-csi-driver 
     volumeMode: Block

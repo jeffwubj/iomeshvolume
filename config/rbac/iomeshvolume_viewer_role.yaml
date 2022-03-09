@@ -5,7 +5,7 @@ metadata:
   name: iomeshvolume-viewer-role
 rules:
 - apiGroups:
-  - iomesh.iomesh.com
+  - poc.iomesh.com
   resources:
   - iomeshvolumes
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - iomesh.iomesh.com
+  - poc.iomesh.com
   resources:
   - iomeshvolumes/status
   verbs:

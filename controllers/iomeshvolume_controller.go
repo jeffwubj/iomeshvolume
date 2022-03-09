@@ -20,6 +20,7 @@ import (
 	"context"
 
 	iomeshv1 "iomesh.com/cdi-iomesh/api/v1"
+	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -41,9 +42,9 @@ type IOMeshVolumeReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=iomesh.iomesh.com,resources=iomeshvolumes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=iomesh.iomesh.com,resources=iomeshvolumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=iomesh.iomesh.com,resources=iomeshvolumes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=poc.iomesh.com,resources=iomeshvolumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=poc.iomesh.com,resources=iomeshvolumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=poc.iomesh.com,resources=iomeshvolumes/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -55,6 +56,9 @@ type IOMeshVolumeReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *IOMeshVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+
+	// TODO get and show node & mount point
+
 	l := log.FromContext(ctx)
 
 	iomv := &iomeshv1.IOMeshVolume{}
@@ -78,9 +82,10 @@ func (r *IOMeshVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	pvcExists := r.pvcExists(iomv)
+	pvc := &corev1.PersistentVolumeClaim{}
 	// TODO handle the case pvc exists but no managed by this iomeshvolume
 	if !pvcExists {
-		pvc, err := r.newPersistentVolumeClaim(iomv)
+		pvc, err = r.newPersistentVolumeClaim(iomv)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -88,6 +93,21 @@ func (r *IOMeshVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			return reconcile.Result{}, err
 		}
 	}
+
+	// TODO update Pod with new node location
+	// TODO handle the case pod exists but no managed by this iomeshvolume
+
+	podExists := r.podExists(iomv)
+	if !podExists {
+		p, err := r.newHelperPod(iomv, pvc)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		if err := r.Create(context.TODO(), p); err != nil {
+			return reconcile.Result{}, err
+		}
+	}
+
 	return ctrl.Result{}, nil
 }
 
