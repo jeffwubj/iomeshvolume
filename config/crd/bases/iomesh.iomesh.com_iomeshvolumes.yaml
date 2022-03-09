@@ -203,7 +203,7 @@ spec:
           status:
             description: IOMeshVolumeStatus defines the observed state of IOMeshVolume
             properties:
-              deviceName:
+              devicePath:
                 type: string
               node:
                 type: string

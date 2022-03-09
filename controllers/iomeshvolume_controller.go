@@ -19,12 +19,20 @@ package controllers
 import (
 	"context"
 
+	iomeshv1 "iomesh.com/cdi-iomesh/api/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
 
-	iomeshv1 "iomesh.com/cdi-iomesh/api/v1"
+const (
+	// ErrResourceExists provides a const to indicate a resource exists error
+	ErrResourceExists = "ErrResourceExists"
+	// MessageResourceExists provides a const to form a resource exists error message
+	MessageResourceExists = "Resource %q already exists and is not managed by IOMeshVolume"
 )
 
 // IOMeshVolumeReconciler reconciles a IOMeshVolume object
@@ -47,10 +55,39 @@ type IOMeshVolumeReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *IOMeshVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	l := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	iomv := &iomeshv1.IOMeshVolume{}
+	err := r.Client.Get(context.TODO(), req.NamespacedName, iomv)
+	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			// New IOMeshVolume
+			return ctrl.Result{}, nil
+		}
+		l.Error(err, "Failed to get IOMeshVolume", "name", req.NamespacedName)
+		return ctrl.Result{}, err
+	}
 
+	if iomv.DeletionTimestamp != nil {
+		l.Info("IOMeshVolume marked for deletion, cleaning up")
+		err := r.cleanup(l, iomv)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+
+	pvcExists := r.pvcExists(iomv)
+	// TODO handle the case pvc exists but no managed by this iomeshvolume
+	if !pvcExists {
+		pvc, err := r.newPersistentVolumeClaim(iomv)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		if err := r.Create(context.TODO(), pvc); err != nil {
+			return reconcile.Result{}, err
+		}
+	}
 	return ctrl.Result{}, nil
 }
 

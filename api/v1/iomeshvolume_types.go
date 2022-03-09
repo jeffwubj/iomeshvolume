@@ -39,7 +39,7 @@ type IOMeshVolumeStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	Node       string                 `json:"node,omitempty"`
-	DeviceName string                 `json:"deviceName,omitempty"`
+	DevicePath string                 `json:"devicePath,omitempty"`
 	Phase      *cdiv1.DataVolumePhase `json:"phase,omitempty"`
 }
 

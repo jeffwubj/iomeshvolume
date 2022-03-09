@@ -3,4 +3,12 @@ kind: IOMeshVolume
 metadata:
   name: iomeshvolume-sample
 spec:
-  # TODO(user): Add fields here
+  node: jeffwu-worker02
+  pvc: 
+    storageClassName: iomesh-csi-driver 
+    volumeMode: Block
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
